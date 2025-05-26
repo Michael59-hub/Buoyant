@@ -11,9 +11,8 @@ interface ProductPageProps {
 }
 
 export default async function ProductPage({params}: ProductPageProps){
-  const { id } = params;
   const product = await prisma.product.findUnique({
-    where: {id},
+    where: {id: params.id},
   })
   if (!product) {
     return (
@@ -64,3 +63,13 @@ export default async function ProductPage({params}: ProductPageProps){
   );
 };
 
+// At the bottom of page.tsx (or in a separate file)
+export async function generateStaticParams(): Promise<{ id: string }[]> {
+  const products = await prisma.product.findMany({
+    select: { id: true },
+  });
+
+  return products.map((product) => ({
+    id: product.id,
+  }));
+}
