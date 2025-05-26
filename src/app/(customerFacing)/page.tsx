@@ -1,4 +1,5 @@
 import { prisma } from "@/db/db"
+// import { Product } from "../../../generated/prisma"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"

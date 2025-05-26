@@ -76,7 +76,8 @@ export async function toggleProductAvailability(id: string, isAvailableForPurcha
     })
 
 }
-//  disabled: boolean
+
+
 export async function deleteProduct(id: string){
     // const product = await prisma.product.findUnique({
     //     where: {id},
