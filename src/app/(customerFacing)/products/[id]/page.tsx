@@ -13,7 +13,8 @@ import Link from "next/link";
 //   isAvailableForPurchase: boolean;
 // }
 
-export default async function ProductPage({params: { id }} : {params: {id: string}}){
+export default async function ProductPage({params} : {params: Promise<{id: string}>}){
+  const {id} = await params;
   const product = await prisma.product.findUnique({
     where: {id},
   })
