@@ -22,7 +22,7 @@ export default async function HomePage(){
                         </CardContent>
                         <CardFooter>
                             <Button asChild variant="outline">
-                                <Link href={`/products/${product.id}`}>View Product</Link>
+                                <Link href={`/products/${product.id}`}>View</Link>
                             </Button>
                         </CardFooter>
                     </Card>
