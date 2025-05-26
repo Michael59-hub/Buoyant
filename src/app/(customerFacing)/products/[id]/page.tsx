@@ -4,16 +4,14 @@ import { Button } from "@/components/ui/button";
 import { prisma } from "@/db/db";
 import Link from "next/link";
 
-// interface Product {
-//   id: string;
-//   name: string;
-//   description: string;
-//   imageUrl: string;
-//   price: number;
-//   isAvailableForPurchase: boolean;
-// }
+interface ProductPageProps {
+  params: {
+    id: string;
+  };
+}
 
-export default async function ProductPage({params: { id }} : {params: {id: string}}){
+export default async function ProductPage({params}: ProductPageProps){
+  const { id } = params;
   const product = await prisma.product.findUnique({
     where: {id},
   })
@@ -32,7 +30,6 @@ export default async function ProductPage({params: { id }} : {params: {id: strin
   }
   return (
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Product Image */}
       <div className="relative aspect-square w-full bg-gray-100 rounded-2xl overflow-hidden shadow">
         <Image
           src={`/${product.imagePath}`}
@@ -41,8 +38,6 @@ export default async function ProductPage({params: { id }} : {params: {id: strin
           objectFit="cover"
         />
       </div>
-
-      {/* Product Details */}
       <div className="flex flex-col justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
@@ -50,8 +45,6 @@ export default async function ProductPage({params: { id }} : {params: {id: strin
             ${product.price / 100}
           </p>
           <p className="text-sm text-gray-700 mb-6">{product.description}</p>
-
-          {/* Availability */}
           <div className="mb-4">
             {product.isAvailableForPurchase ? (
               <span className="text-green-500 font-medium">In Stock</span>
@@ -60,8 +53,6 @@ export default async function ProductPage({params: { id }} : {params: {id: strin
             )}
           </div>
         </div>
-
-        {/* Add to Cart */}
         <Button
           className="w-full py-4 text-lg"
           disabled={!product.isAvailableForPurchase}
