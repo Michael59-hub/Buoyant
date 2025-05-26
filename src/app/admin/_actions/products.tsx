@@ -4,8 +4,6 @@ import { prisma } from "@/db/db";
 import { z } from "zod";
 import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
-import { randomUUID } from "crypto";
-import { data } from "react-router-dom";
 
 
 const fileSchema = z.instanceof(File, {message :  "File is required"})
@@ -79,7 +77,7 @@ export async function toggleProductAvailability(id: string, isAvailableForPurcha
 
 }
 
-export async function deleteProduct(id: string, disabled: boolean){
+export async function deleteProduct(id: string){
     // const product = await prisma.product.findUnique({
     //     where: {id},
     //     select: {

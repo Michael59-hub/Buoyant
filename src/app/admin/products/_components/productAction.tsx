@@ -26,7 +26,7 @@ export function DeleteDropdownItem({id, disabled}: {id: string, disabled: boolea
     return<>
         <DropdownMenuItem disabled={disabled || ispending} onClick={() =>{
             startTransition(async () =>{
-                await deleteProduct(id, !disabled)
+                await deleteProduct(id)
                 router.refresh();
             })
         }}>

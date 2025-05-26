@@ -22,7 +22,7 @@ export default async function ProductPage({params: { id }} : {params: {id: strin
       <div className="max-w-2xl mx-auto p-10 text-center">
         <h1 className="text-4xl font-bold mb-4">Product Not Found</h1>
         <p className="text-gray-600 mb-6">
-          We couldn't find the product you're looking for. It may have been removed or never existed.
+          We couldn&apost find the product you&aposre looking for. It may have been removed or never existed.
         </p>
         <Link href="/" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">
           Go Back Home

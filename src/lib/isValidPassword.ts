@@ -1,5 +1,3 @@
-import bcrypt from "bcryptjs";
-
 export async function isValidPassword(password: string, hashedPassword: string): Promise<boolean> {
     if (!password || !hashedPassword) return false;
     console.log(await passwordHasher(password));

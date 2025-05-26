@@ -1,9 +1,10 @@
 import { prisma } from "@/db/db"
-import { Product } from "../../../generated/prisma"
+// import { Product } from "../../../generated/prisma"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/formatters"
+import Image from "next/image"
 
 export default async function HomePage(){
     const products = await getMostPopularProducts()
@@ -14,7 +15,7 @@ export default async function HomePage(){
                 return(
                     <Card key={product.id} className="w-1/5">
                         <CardHeader>
-                            <img src={product.imagePath} alt={product.name} className="w-4/5 mb-4" />
+                            <Image src={product.imagePath} alt={product.name} className="w-4/5 mb-4" />
                             <CardTitle className="font-light">{product.name}</CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -56,30 +57,30 @@ function getMostPopularProducts(){
     })
 }
 
-function getNewestProducts(){
-    return prisma.product.findMany({
-        where : {isAvailableForPurchase : true},
-        orderBy: { createdAt: "desc"},
-        take: 5,
-    })
+// function getNewestProducts(){
+//     return prisma.product.findMany({
+//         where : {isAvailableForPurchase : true},
+//         orderBy: { createdAt: "desc"},
+//         take: 5,
+//     })
 
     
-}    
-type productsGridSectionProps = {
-    title: string,
-    productsFetcher: ()=> Promise<Product[]>
-}
+// }    
+// type productsGridSectionProps = {
+//     title: string,
+//     productsFetcher: ()=> Promise<Product[]>
+// }
 
-function ProductGridSection({productsFetcher, title}: productsGridSectionProps){
-    return(
-        <div className="space-y-4">
-            <div className="flex gap-4">
-                <h2 className="text-3xl font-bold">
-                    <Button asChild variant="outline">
-                        <Link href="/products">View all</Link>
-                    </Button>
-                </h2>
-            </div>
-        </div>
-    )
-}
+// function ProductGridSection({productsFetcher, title}: productsGridSectionProps){
+//     return(
+//         <div className="space-y-4">
+//             <div className="flex gap-4">
+//                 <h2 className="text-3xl font-bold">
+//                     <Button asChild variant="outline">
+//                         <Link href="/products">View all</Link>
+//                     </Button>
+//                 </h2>
+//             </div>
+//         </div>
+//     )
+// }
