@@ -3,6 +3,7 @@ import { Product } from "../../../generated/prisma"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatCurrency } from "@/lib/formatters"
 
 export default async function HomePage(){
     const products = await getMostPopularProducts()
@@ -17,7 +18,7 @@ export default async function HomePage(){
                             <CardTitle className="font-light">{product.name}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="font-bold">${product.price/100}</p>
+                            <p className="font-bold">${formatCurrency(product.price / 100)}</p>
                         </CardContent>
                         <CardFooter>
                             <Button asChild variant="outline">
