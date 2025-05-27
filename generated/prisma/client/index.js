@@ -156,7 +156,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "c:\\Users\\HP\\Desktop\\Web Dev\\NextJS-ecommerce\\buoyant\\generated\\prisma\\client",
+      "value": "C:\\Users\\HP\\Desktop\\Web Dev\\NextJS-ecommerce\\buoyant\\generated\\prisma\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -170,11 +170,11 @@ const config = {
       },
       {
         "fromEnvVar": null,
-        "value": "rhel-openssl-1.0.x"
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "c:\\Users\\HP\\Desktop\\Web Dev\\NextJS-ecommerce\\buoyant\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\HP\\Desktop\\Web Dev\\NextJS-ecommerce\\buoyant\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -197,8 +197,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma/client\"\n  binaryTargets = [\"native\", \"rhel-openssl-1.0.x\"]\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\nmodel Product {\n  id                     String                 @id @default(uuid())\n  name                   String\n  price                  Int\n  filePath               String\n  imagePath              String\n  description            String\n  isAvailableForPurchase Boolean                @default(true)\n  createdAt              DateTime               @default(now())\n  updatedAt              DateTime               @updatedAt\n  orders                 Order[]\n  downloadVerifications  DownloadVerification[]\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  orders    Order[]\n}\n\nmodel Order {\n  id        String   @id @default(uuid())\n  pricePaid Int\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  userId    String\n  productId String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)\n}\n\nmodel DownloadVerification {\n  id        String   @id @default(uuid())\n  expiresAt DateTime\n  createdAt DateTime @default(now())\n  productId String\n  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)\n}\n",
-  "inlineSchemaHash": "7ccab946a6b534a933654f5027f7ca4a5e15cec88637196bf63741596bd68cb1",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma/client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\nmodel Product {\n  id                     String                 @id @default(uuid())\n  name                   String\n  price                  Int\n  filePath               String\n  imagePath              String\n  description            String\n  isAvailableForPurchase Boolean                @default(true)\n  createdAt              DateTime               @default(now())\n  updatedAt              DateTime               @updatedAt\n  orders                 Order[]\n  downloadVerifications  DownloadVerification[]\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  orders    Order[]\n}\n\nmodel Order {\n  id        String   @id @default(uuid())\n  pricePaid Int\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  userId    String\n  productId String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)\n}\n\nmodel DownloadVerification {\n  id        String   @id @default(uuid())\n  expiresAt DateTime\n  createdAt DateTime @default(now())\n  productId String\n  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)\n}\n",
+  "inlineSchemaHash": "87123c9427cf2e08be05f5707dc0ba0fa30e677d0cd089e708cf407a19f586c2",
   "copyEngine": true
 }
 
@@ -241,8 +241,8 @@ path.join(__dirname, "query_engine-windows.dll.node");
 path.join(process.cwd(), "generated/prisma/client/query_engine-windows.dll.node")
 
 // file annotations for bundling tools to include these files
-path.join(__dirname, "libquery_engine-rhel-openssl-1.0.x.so.node");
-path.join(process.cwd(), "generated/prisma/client/libquery_engine-rhel-openssl-1.0.x.so.node")
+path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node");
+path.join(process.cwd(), "generated/prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "generated/prisma/client/schema.prisma")
