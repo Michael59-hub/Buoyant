@@ -1,4 +1,27 @@
 import { PrismaClient } from "../../generated/prisma/client";
+// import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+// const supabaseUrl = process.env.PROJECT_URL!;
+// const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
+
+// declare global {
+//   // eslint-disable-next-line no-var
+//   var supabase: SupabaseClient | undefined;
+// }
+
+
+
+// const globalWithSupabase = global as typeof global & {
+//   supabase?: SupabaseClient;
+// };
+
+// export const supabase =
+//   globalWithSupabase.supabase ?? createClient(supabaseUrl, supabaseAnonKey);
+
+// if (process.env.NODE_ENV !== 'production') {
+//   globalWithSupabase.supabase = supabase;
+// }
+
 
 // lib/prisma.ts
 const globalForPrisma = global as unknown as { prisma: PrismaClient };

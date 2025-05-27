@@ -4,10 +4,11 @@ import { prisma } from "@/db/db";
 import { z } from "zod";
 import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
-
+import { createClient} from "@supabase/supabase-js"
 
 const fileSchema = z.instanceof(File, {message :  "File is required"})
 const imageSchema = fileSchema.refine(file=> file.size === 0 || file.type.startsWith("image/"))
+const supabase = createClient(process.env.PROJECT_URL!, process.env.SUPABASE_ANON_KEY!);
 
 const addSchema = z.object({
     name: z.string().min(1),
@@ -24,9 +25,31 @@ export async function addProduct(prevState: unknown, formData: FormData){
        return result.error.formErrors.fieldErrors
     }
     const data  = result.data;
+    const actualImage = Buffer.from(await data.image.arrayBuffer());
+    const actualFile = Buffer.from(await data.file.arrayBuffer());
     const uuid = crypto.randomUUID();
     const filePath = `products/${uuid}-${data.file.name}`
     const imagePath = `products/${uuid}-${data.image.name}`
+    await supabase.storage.from("images").upload(imagePath, actualImage, {
+        cacheControl: "3600",
+        upsert: true
+    }).then(({error})=>{
+        if(error) {
+            console.error("Error uploading image to Supabase:", error);
+        }
+    })
+    const ImagePublicUrl = supabase.storage.from('images').getPublicUrl(imagePath).data.publicUrl;
+    const FilePublicUrl = supabase.storage.from('files').getPublicUrl(filePath).data.publicUrl;
+    console.log('Image Public URL:', ImagePublicUrl)
+    console.log('Public URL:', FilePublicUrl)
+    await supabase.storage.from("files").upload(filePath, actualFile, {
+        cacheControl: "3600",
+        upsert: true
+    }).then(({error})=>{
+        if(error) {
+            console.error("Error uploading file to Supabase:", error);
+        }
+    })
     await fs.mkdir("products", {recursive: true})
     
     await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
@@ -43,27 +66,6 @@ export async function addProduct(prevState: unknown, formData: FormData){
         imagePath,
         isAvailableForPurchase: true
     }})
-    // try{
-    //     await fs.mkdir("products", {recursive: true})
-    
-    //     await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
-
-    //     await fs.mkdir("public/products", {recursive: true})
-        
-    //     await fs.writeFile(`public/${imagePath}`, Buffer.from(await data.image.arrayBuffer()))
-
-    //     await prisma.product.create({data: {
-    //         name: data.name,
-    //         description: data.description,
-    //         price: data.price,
-    //         filePath,
-    //         imagePath,
-    //         isAvailableForPurchase: true
-    //     }})
-    // }catch(err){
-    //     console.error(err);
-    //     return{general : "Something went wrong while adding the product"}
-    // }
     
     redirect("/admin/products");
 }

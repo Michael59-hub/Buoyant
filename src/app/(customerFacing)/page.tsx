@@ -15,11 +15,11 @@ export default async function HomePage(){
                 return(
                     <Card key={product.id} className="w-1/5">
                         <CardHeader>
-                            <Image src={product.imagePath} alt={product.name} className="w-4/5 mb-4" />
+                            <Image src={`https://jcmfszwaxbdnnugiuwcs.supabase.co/storage/v1/object/public/images/${product.imagePath}`} width={400} height={300} alt={product.name} className="w-4/5 mb-4" />
                             <CardTitle className="font-light">{product.name}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="font-bold">${formatCurrency(product.price / 100)}</p>
+                            <p className="font-bold">{formatCurrency(product.price / 100)}</p>
                         </CardContent>
                         <CardFooter>
                             <Button asChild variant="outline">
