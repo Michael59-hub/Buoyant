@@ -1,51 +1,27 @@
 import { prisma } from "@/db/db"
 // import { Product } from "../../../generated/prisma"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency } from "@/lib/formatters"
-import Image from "next/image"
+import ProductsCard from "@/components/ProductsCard"
 
 export default async function HomePage(){
-    const products = await getMostPopularProducts()
+    const popularProducts = await getMostPopularProducts()
+    const newestProducts = await getNewestProducts()
     return<>
-        <h1>Hello</h1>
+        <h2>Most popular products</h2>
         <div className="flex justify-evenly flex-wrap gap-4">
-            {products.map(product =>{
+            {popularProducts.map(product =>{
                 return(
-                    <Card key={product.id} className="w-1/5">
-                        <CardHeader>
-                            <Image src={`https://jcmfszwaxbdnnugiuwcs.supabase.co/storage/v1/object/public/images/${product.imagePath}`} width={400} height={300} alt={product.name} className="w-4/5 mb-4" />
-                            <CardTitle className="font-light">{product.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="font-bold">{formatCurrency(product.price / 100)}</p>
-                        </CardContent>
-                        <CardFooter>
-                            <Button asChild variant="outline">
-                                <Link href={`/products/${product.id}`}>View</Link>
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                    <ProductsCard key={product.id} product={product} />
                 )
             })}
         </div>
-        
-        {/* {products.map(product =>{
-            return (
-                <div className="flex justify-evenly flex-col">
-                    <div key={product.id} className="p-4 border rounded-lg">
-                    <img src={product.imagePath} alt={product.name} className="w-1/5 h-48 object-cover mb-4 rounded-lg" />
-                    <h2 className="text-xl font-bold">{product.name}</h2>
-                    <p className="text-gray-500">Price: ${product.price / 100}</p>
-                    <Button asChild variant="outline">
-                        <Link href={`/products/${product.id}`}>View Product</Link>
-                    </Button>
-                    </div>
-                </div>
-                
-            )
-        })} */}
+        <h2>Newest Products</h2>
+        <div className="flex justify-evenly flex-wrap gap-4">
+            {newestProducts.map(product =>{
+                return(
+                    <ProductsCard key={product.id} product={product} />
+                )
+            })}
+        </div>
     </>
 }
 
@@ -57,15 +33,15 @@ function getMostPopularProducts(){
     })
 }
 
-// function getNewestProducts(){
-//     return prisma.product.findMany({
-//         where : {isAvailableForPurchase : true},
-//         orderBy: { createdAt: "desc"},
-//         take: 5,
-//     })
+function getNewestProducts(){
+    return prisma.product.findMany({
+        where : {isAvailableForPurchase : true},
+        orderBy: { createdAt: "desc"},
+        take: 5,
+    })
 
     
-// }    
+}    
 // type productsGridSectionProps = {
 //     title: string,
 //     productsFetcher: ()=> Promise<Product[]>
