@@ -8,7 +8,7 @@ import { formatCurrency } from "@/lib/formatters"
 import React, { useState } from "react"
 import { addProduct, updateProduct } from "../../_actions/products"
 import { useFormStatus } from "react-dom"
-import { Product } from "../../../../../generated/prisma"
+import { Product } from "../../../../../generated/prisma/client"
 import Image from "next/image"
 
 export default function ProductForm({product} : {product?: Product | null}){
