@@ -25,3 +25,22 @@ export default function ProductsCard({product}: {product : productParams}){
         </Card>
     </>
 }
+
+export function ProductCardSkeleton(){
+    return<>
+        <Card className="w-1/5">
+            <CardHeader>
+                
+                <CardTitle className="font-light"></CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="font-bold"></p>
+            </CardContent>
+            <CardFooter>
+                <Button asChild variant="outline">
+        
+                </Button>
+            </CardFooter>
+        </Card>
+    </>
+}
