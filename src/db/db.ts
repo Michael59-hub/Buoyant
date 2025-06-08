@@ -1,4 +1,4 @@
-import { PrismaClient as PostgresClient } from "../../generated/prisma/client";
+// import { PrismaClient as PostgresClient } from "../../generated/prisma/client";
 import { PrismaClient as SqliteClient } from "../../generated/prisma/sqliteClient";
 // import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -11,7 +11,7 @@ import { PrismaClient as SqliteClient } from "../../generated/prisma/sqliteClien
 // }
 
 type GlobalPrisma = {
-  prisma: PostgresClient | SqliteClient;
+  prisma: SqliteClient;
 };
 
 // const globalWithSupabase = global as typeof global & {
@@ -24,14 +24,13 @@ type GlobalPrisma = {
 // if (process.env.NODE_ENV !== 'production') {
 //   globalWithSupabase.supabase = supabase;
 // }
-const isSQLite = process.env.DATABASE_URL?.startsWith('file:');
 
 const globalForPrisma = globalThis as typeof globalThis & GlobalPrisma;
 
-let client: PostgresClient | SqliteClient;
+let client: SqliteClient;
 
 if (!globalForPrisma.prisma) {
-  client = isSQLite ? new SqliteClient() : new PostgresClient();
+  client = new SqliteClient();
 
   if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = client;

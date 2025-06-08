@@ -5,6 +5,7 @@ import { z } from "zod";
 import fs from "fs/promises";
 import { notFound, redirect } from "next/navigation";
 import { createClient} from "@supabase/supabase-js"
+import { revalidatePath } from "next/cache";
 
 const fileSchema = z.instanceof(File, {message :  "File is required"})
 const imageSchema = fileSchema.refine(file=> file.size === 0 || file.type.startsWith("image/"))
@@ -66,7 +67,8 @@ export async function addProduct(prevState: unknown, formData: FormData){
         imagePath,
         isAvailableForPurchase: true
     }})
-    
+    revalidatePath("/");
+    revalidatePath("/products");
     redirect("/admin/products");
 }
 
@@ -76,7 +78,8 @@ export async function toggleProductAvailability(id: string, isAvailableForPurcha
         where: {id},
         data: {isAvailableForPurchase}
     })
-
+    revalidatePath("/");
+    revalidatePath("/products");
 }
 
 
@@ -100,6 +103,10 @@ export async function deleteProduct(id: string){
         console.error(err);
         return {general : "File or image path does not match"}
     }
+
+
+    revalidatePath("/");
+    revalidatePath("/products");
     
 }
 
@@ -141,6 +148,9 @@ export async function updateProduct(id: string , prevState: unknown, formData: F
             imagePath,
         },
     })
+
+    revalidatePath("/");
+    revalidatePath("/products");
     redirect("/admin/products");
 }
 

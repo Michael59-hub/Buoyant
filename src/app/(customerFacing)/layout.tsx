@@ -1,4 +1,5 @@
-import { Nav, NavLink } from "@/components/Nav";
+
+
 
 
 
@@ -11,12 +12,13 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return <>
-        <Nav>
+        {/* <Nav>
         <NavLink href="/">Home</NavLink>
         <NavLink href="/products">Products</NavLink>
         <NavLink href="/orders">My Orders</NavLink>
-        </Nav>
-        <div className="container my-6">{children}</div>
+        </Nav> */}
+          {children}
+        
     </>;
 
 }

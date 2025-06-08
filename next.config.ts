@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ['jcmfszwaxbdnnugiuwcs.supabase.co'],
+    domains: ['jcmfszwaxbdnnugiuwcs.supabase.co', "www.google.com"],
   },
 };
 

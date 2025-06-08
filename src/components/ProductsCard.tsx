@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Product } from "../../generated/prisma/client";
@@ -17,36 +17,36 @@ export default function ProductsCard({product}: {product : productParams}){
         imageUrl = supabaseUrl;
     }
     return<>
-        <Card className="w-1/5">
-            <CardHeader>
-                <Image src={imageUrl} width={400} height={300} alt={product.name} className="w-4/5 mb-4" />
-                <CardTitle className="font-light">{product.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="font-bold">{formatCurrency(product.price / 100)}</p>
-            </CardContent>
-            <CardFooter>
-                <Button asChild variant="outline">
-                    <Link href={`/products/${product.id}`}>View</Link>
-                </Button>
-            </CardFooter>
-        </Card>
+        <Link href={`/products/${product.id}`} className="block">
+            <Card className="overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
+                <div className="relative w-full h-auto aspect-video">
+                    <Image src={imageUrl}  alt={product.name} fill  />
+                </div>
+                <CardHeader>
+                    <CardTitle className="font-light">{product.name}</CardTitle>
+                    <CardDescription><p className="font-bold">{formatCurrency(product.price / 100)}</p></CardDescription>
+                </CardHeader>
+            </Card>
+        </Link>
     </>
 }
 
 export function ProductCardSkeleton(){
     return<>
-        <Card className="w-1/5">
+        <Card className="overflow-hidden flex flex-col animate-pulse">
+            <div className="w-full bg-gray-300 aspect-video">
+            </div>
             <CardHeader>
-                
-                <CardTitle className="font-light"></CardTitle>
+                <div className="bg-gray-300 w-3/4 h-6"></div>
             </CardHeader>
-            <CardContent>
-                <p className="font-bold"></p>
+            <CardContent className="flex-grow">
+                <div className="bg-gray-300 w-full h-4 rounded-full"></div>
+                <div className="bg-gray-300 w-full h-4 rounded-full"></div>
+                <div className="bg-gray-300 w-full h-4 rounded-full"></div>
             </CardContent>
             <CardFooter>
-                <Button asChild variant="outline">
-        
+                <Button disabled size="lg" className="w-full">
+                    
                 </Button>
             </CardFooter>
         </Card>

@@ -53,11 +53,12 @@ export default async function ProductPage({params} : {params: Promise<{id: strin
             )}
           </div>
         </div>
-        <Button
-          className="w-full py-4 text-lg"
-          disabled={!product.isAvailableForPurchase}
-        >
-          {product.isAvailableForPurchase ? "Add to Cart" : "Unavailable"}
+        <Button asChild className="w-full py-4 text-lg" disabled={!product.isAvailableForPurchase}>
+          <Link href={`/products/${product.id}/purchase`}>
+            <span className="flex items-center justify-center">
+              {product.isAvailableForPurchase ? "Buy Now" : "Unavailable"}
+            </span>
+          </Link>
         </Button>
       </div>
     </div>

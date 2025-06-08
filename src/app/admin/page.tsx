@@ -78,3 +78,4 @@ const getProductData = async () =>{
         activeCount,inactiveCount
     }
 }
+
