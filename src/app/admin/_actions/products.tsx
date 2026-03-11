@@ -62,9 +62,8 @@ export async function addProduct(prevState: unknown, formData: FormData){
     }
 
     // Upload file to Cloudinary
-    let fileUploadResult;
     try {
-        fileUploadResult = await new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 {
                     folder: 'products/files',

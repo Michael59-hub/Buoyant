@@ -1,6 +1,5 @@
 import React from "react"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { prisma } from "@/db/db"
 import Link from "next/link"
 import { getProductById } from "@/lib/cache"

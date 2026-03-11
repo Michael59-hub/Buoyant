@@ -158,7 +158,7 @@ export default function CatalogClient({ products }: { products: Product[] }) {
   const [view, setView] = useState<ViewMode>("grid")
 
   const filtered = useMemo(() => {
-    let result = activeCategory === "all"
+    const result = activeCategory === "all"
       ? [...products]
       : products.filter(p => p.category === activeCategory)
 

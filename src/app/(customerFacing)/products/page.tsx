@@ -1,4 +1,3 @@
-import { prisma } from "@/db/db"
 import CatalogClient from "./CatalogClient"
 import { getProducts } from "@/lib/cache"
 
