@@ -1239,6 +1239,7 @@ export namespace Prisma {
     filePath: string | null
     imagePath: string | null
     description: string | null
+    category: string | null
     isAvailableForPurchase: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1251,6 +1252,7 @@ export namespace Prisma {
     filePath: string | null
     imagePath: string | null
     description: string | null
+    category: string | null
     isAvailableForPurchase: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1263,6 +1265,7 @@ export namespace Prisma {
     filePath: number
     imagePath: number
     description: number
+    category: number
     isAvailableForPurchase: number
     createdAt: number
     updatedAt: number
@@ -1285,6 +1288,7 @@ export namespace Prisma {
     filePath?: true
     imagePath?: true
     description?: true
+    category?: true
     isAvailableForPurchase?: true
     createdAt?: true
     updatedAt?: true
@@ -1297,6 +1301,7 @@ export namespace Prisma {
     filePath?: true
     imagePath?: true
     description?: true
+    category?: true
     isAvailableForPurchase?: true
     createdAt?: true
     updatedAt?: true
@@ -1309,6 +1314,7 @@ export namespace Prisma {
     filePath?: true
     imagePath?: true
     description?: true
+    category?: true
     isAvailableForPurchase?: true
     createdAt?: true
     updatedAt?: true
@@ -1408,6 +1414,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category: string
     isAvailableForPurchase: boolean
     createdAt: Date
     updatedAt: Date
@@ -1439,6 +1446,7 @@ export namespace Prisma {
     filePath?: boolean
     imagePath?: boolean
     description?: boolean
+    category?: boolean
     isAvailableForPurchase?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1454,6 +1462,7 @@ export namespace Prisma {
     filePath?: boolean
     imagePath?: boolean
     description?: boolean
+    category?: boolean
     isAvailableForPurchase?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1466,6 +1475,7 @@ export namespace Prisma {
     filePath?: boolean
     imagePath?: boolean
     description?: boolean
+    category?: boolean
     isAvailableForPurchase?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1478,12 +1488,13 @@ export namespace Prisma {
     filePath?: boolean
     imagePath?: boolean
     description?: boolean
+    category?: boolean
     isAvailableForPurchase?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "filePath" | "imagePath" | "description" | "isAvailableForPurchase" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "filePath" | "imagePath" | "description" | "category" | "isAvailableForPurchase" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     orders?: boolean | Product$ordersArgs<ExtArgs>
     downloadVerifications?: boolean | Product$downloadVerificationsArgs<ExtArgs>
@@ -1505,6 +1516,7 @@ export namespace Prisma {
       filePath: string
       imagePath: string
       description: string
+      category: string
       isAvailableForPurchase: boolean
       createdAt: Date
       updatedAt: Date
@@ -1939,6 +1951,7 @@ export namespace Prisma {
     readonly filePath: FieldRef<"Product", 'String'>
     readonly imagePath: FieldRef<"Product", 'String'>
     readonly description: FieldRef<"Product", 'String'>
+    readonly category: FieldRef<"Product", 'String'>
     readonly isAvailableForPurchase: FieldRef<"Product", 'Boolean'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
@@ -5632,6 +5645,7 @@ export namespace Prisma {
     filePath: 'filePath',
     imagePath: 'imagePath',
     description: 'description',
+    category: 'category',
     isAvailableForPurchase: 'isAvailableForPurchase',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -5769,6 +5783,7 @@ export namespace Prisma {
     filePath?: StringFilter<"Product"> | string
     imagePath?: StringFilter<"Product"> | string
     description?: StringFilter<"Product"> | string
+    category?: StringFilter<"Product"> | string
     isAvailableForPurchase?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -5783,6 +5798,7 @@ export namespace Prisma {
     filePath?: SortOrder
     imagePath?: SortOrder
     description?: SortOrder
+    category?: SortOrder
     isAvailableForPurchase?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -5800,6 +5816,7 @@ export namespace Prisma {
     filePath?: StringFilter<"Product"> | string
     imagePath?: StringFilter<"Product"> | string
     description?: StringFilter<"Product"> | string
+    category?: StringFilter<"Product"> | string
     isAvailableForPurchase?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -5814,6 +5831,7 @@ export namespace Prisma {
     filePath?: SortOrder
     imagePath?: SortOrder
     description?: SortOrder
+    category?: SortOrder
     isAvailableForPurchase?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -5834,6 +5852,7 @@ export namespace Prisma {
     filePath?: StringWithAggregatesFilter<"Product"> | string
     imagePath?: StringWithAggregatesFilter<"Product"> | string
     description?: StringWithAggregatesFilter<"Product"> | string
+    category?: StringWithAggregatesFilter<"Product"> | string
     isAvailableForPurchase?: BoolWithAggregatesFilter<"Product"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -6011,6 +6030,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -6025,6 +6045,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -6039,6 +6060,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6053,6 +6075,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6067,6 +6090,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -6079,6 +6103,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6091,6 +6116,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6327,6 +6353,7 @@ export namespace Prisma {
     filePath?: SortOrder
     imagePath?: SortOrder
     description?: SortOrder
+    category?: SortOrder
     isAvailableForPurchase?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -6343,6 +6370,7 @@ export namespace Prisma {
     filePath?: SortOrder
     imagePath?: SortOrder
     description?: SortOrder
+    category?: SortOrder
     isAvailableForPurchase?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -6355,6 +6383,7 @@ export namespace Prisma {
     filePath?: SortOrder
     imagePath?: SortOrder
     description?: SortOrder
+    category?: SortOrder
     isAvailableForPurchase?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -6972,6 +7001,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -6985,6 +7015,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -7039,6 +7070,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7052,6 +7084,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7065,6 +7098,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -7078,6 +7112,7 @@ export namespace Prisma {
     filePath: string
     imagePath: string
     description: string
+    category?: string
     isAvailableForPurchase?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -7107,6 +7142,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7120,6 +7156,7 @@ export namespace Prisma {
     filePath?: StringFieldUpdateOperationsInput | string
     imagePath?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
     isAvailableForPurchase?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

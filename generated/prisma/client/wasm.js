@@ -127,6 +127,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   filePath: 'filePath',
   imagePath: 'imagePath',
   description: 'description',
+  category: 'category',
   isAvailableForPurchase: 'isAvailableForPurchase',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -4,6 +4,7 @@ import { prisma, cloudinary } from "@/db/db";
 import { z } from "zod";
 import sharp from "sharp";
 import { notFound, redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 const fileSchema = z.instanceof(File, {message :  "File is required"})
 const imageSchema = fileSchema.refine(file=> file.size === 0 || file.type.startsWith("image/"))
@@ -97,7 +98,7 @@ export async function addProduct(prevState: unknown, formData: FormData){
         imagePath,
         isAvailableForPurchase: true
     }})
-    
+    revalidateTag("products")
     redirect("/admin/products");
 }
 

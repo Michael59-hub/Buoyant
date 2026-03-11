@@ -28,4 +28,4 @@ async function passwordHasher(password){
     return Buffer.from(arrayBuffer).toString("base64");
 }
 
-passwordHasher("12345").then(hash => console.log(hash));
+passwordHasher("12345").then(hash => console.log(hash)); 
