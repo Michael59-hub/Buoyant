@@ -32,7 +32,7 @@ export default async function ProductPage({params} : {params: Promise<{id: strin
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="relative aspect-square w-full bg-gray-100 rounded-2xl overflow-hidden shadow">
         <Image
-          src={`/${product.imagePath}`}
+          src={`https://res.cloudinary.com/dmal6jha3/image/upload/v1773235223/${product.imagePath}`}
           alt={product.name}
           layout="fill"
           objectFit="cover"

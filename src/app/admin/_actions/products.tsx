@@ -1,14 +1,12 @@
 "use server"
 
-import { prisma } from "@/db/db";
+import { prisma, cloudinary } from "@/db/db";
 import { z } from "zod";
-import fs from "fs/promises";
+import sharp from "sharp";
 import { notFound, redirect } from "next/navigation";
-import { createClient} from "@supabase/supabase-js"
 
 const fileSchema = z.instanceof(File, {message :  "File is required"})
 const imageSchema = fileSchema.refine(file=> file.size === 0 || file.type.startsWith("image/"))
-const supabase = createClient(process.env.PROJECT_URL!, process.env.SUPABASE_ANON_KEY!);
 
 const addSchema = z.object({
     name: z.string().min(1),
@@ -25,38 +23,71 @@ export async function addProduct(prevState: unknown, formData: FormData){
        return result.error.formErrors.fieldErrors
     }
     const data  = result.data;
-    const actualImage = Buffer.from(await data.image.arrayBuffer());
+    // read buffers from the uploaded files
+    let actualImage = Buffer.from(await data.image.arrayBuffer());
     const actualFile = Buffer.from(await data.file.arrayBuffer());
-    const uuid = crypto.randomUUID();
-    const filePath = `products/${uuid}-${data.file.name}`
-    const imagePath = `products/${uuid}-${data.image.name}`
-    await supabase.storage.from("images").upload(imagePath, actualImage, {
-        cacheControl: "3600",
-        upsert: true
-    }).then(({error})=>{
-        if(error) {
-            console.error("Error uploading image to Supabase:", error);
-        }
-    })
-    const ImagePublicUrl = supabase.storage.from('images').getPublicUrl(imagePath).data.publicUrl;
-    const FilePublicUrl = supabase.storage.from('files').getPublicUrl(filePath).data.publicUrl;
-    console.log('Image Public URL:', ImagePublicUrl)
-    console.log('Public URL:', FilePublicUrl)
-    await supabase.storage.from("files").upload(filePath, actualFile, {
-        cacheControl: "3600",
-        upsert: true
-    }).then(({error})=>{
-        if(error) {
-            console.error("Error uploading file to Supabase:", error);
-        }
-    })
-    await fs.mkdir("products", {recursive: true})
-    
-    await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
 
-    await fs.mkdir("public/products", {recursive: true})
-    
-    await fs.writeFile(`public/${imagePath}`, Buffer.from(await data.image.arrayBuffer()))
+    // compress/resize the image before sending to Cloudinary
+    // you can tweak width/quality as needed
+    actualImage = await sharp(actualImage)
+      .resize({ width: 1024, withoutEnlargement: true })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+
+    const uuid = crypto.randomUUID();
+    const filePath = `products/images/${uuid}-${data.file.name}`
+    const imagePath = `products/images/${uuid}-${data.image.name}`
+
+    // Upload image to Cloudinary
+    let imageUploadResult;
+    try {
+        imageUploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'products/images',
+                    public_id: `${uuid}-${data.image.name.split('.')[0]}`,
+                    resource_type: 'image'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            uploadStream.end(actualImage);
+        });
+    } catch (error) {
+        console.error("Error uploading image to Cloudinary:", error);
+        return { general: "Failed to upload image" };
+    }
+
+    // Upload file to Cloudinary
+    let fileUploadResult;
+    try {
+        fileUploadResult = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'products/files',
+                    public_id: `${uuid}-${data.file.name.split('.')[0]}`,
+                    resource_type: 'raw'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            uploadStream.end(actualFile);
+        });
+    } catch (error) {
+        console.error("Error uploading file to Cloudinary:", error);
+        // Try to delete the image if file upload failed
+        try {
+            await cloudinary.uploader.destroy(imageUploadResult.public_id, { resource_type: 'image' });
+        } catch (cleanupError) {
+            console.error("Error cleaning up image after file upload failure:", cleanupError);
+        }
+        return { general: "Failed to upload file" };
+    }
+
 
     await prisma.product.create({data: {
         name: data.name,
@@ -81,26 +112,33 @@ export async function toggleProductAvailability(id: string, isAvailableForPurcha
 
 
 export async function deleteProduct(id: string){
-    // const product = await prisma.product.findUnique({
-    //     where: {id},
-    //     select: {
-    //         filePath: true,
-    //         imagePath: true
-    //     }
-    // })
-    // if(!product) return;
-    // await fs.unlink(product.filePath)
-    // await fs.unlink(product.imagePath)
-    const product = await prisma.product.delete({where: {id}})
-    if(product == null) return notFound()
-    try{  
-        await fs.unlink(product.filePath)
-        await fs.unlink(`public/${product.imagePath}`)
-    }catch(err){
-        console.error(err);
-        return {general : "File or image path does not match"}
+    const product = await prisma.product.findUnique({
+        where: {id},
+        select: {
+            filePath: true,
+            imagePath: true
+        }
+    })
+    if(!product) return notFound();
+
+    // Delete from Cloudinary
+    try {
+        // Extract public IDs from paths (assuming format: products/images/uuid-filename or products/files/uuid-filename)
+        const imagePublicId = `products/images/${product.imagePath.split('/').pop()?.split('.')[0]}`;
+        const filePublicId = `products/files/${product.filePath.split('/').pop()?.split('.')[0]}`;
+
+        await Promise.all([
+            cloudinary.uploader.destroy(imagePublicId, { resource_type: 'image' }),
+            cloudinary.uploader.destroy(filePublicId, { resource_type: 'raw' })
+        ]);
+    } catch (error) {
+        console.error("Error deleting from Cloudinary:", error);
+        // Continue with local file deletion even if Cloudinary deletion fails
     }
-    
+
+
+
+    await prisma.product.delete({where: {id}})
 }
 
 const editSchema = addSchema.extend({
@@ -121,15 +159,11 @@ export async function updateProduct(id: string , prevState: unknown, formData: F
     }
     let filePath = product.filePath
     let imagePath = product.imagePath
-    if(data.file != null && data.file.size > 0){
-        await fs.unlink(product.filePath)
-        filePath = `products/${crypto.randomUUID()}-${data.file.name} `
-        await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
+    if (data.file != null && data.file.size > 0) {
+        filePath = `products/${crypto.randomUUID()}-${data.file.name}`;
     }
-    if(data.image != null && data.image.size > 0){
-        await fs.unlink(`public/${product.imagePath}`)
-        imagePath = `products/${crypto.randomUUID()}-${data.image.name} `
-        await fs.writeFile(`public/${imagePath}`, Buffer.from(await data.image.arrayBuffer()))
+    if (data.image != null && data.image.size > 0) {
+        imagePath = `products/${crypto.randomUUID()}-${data.image.name}`;
     }
     await prisma.product.update({
         where: {id},

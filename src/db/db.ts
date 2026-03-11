@@ -1,27 +1,14 @@
 import { PrismaClient } from "../../generated/prisma/client";
-// import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { v2 as cloudinary } from 'cloudinary';
 
-// const supabaseUrl = process.env.PROJECT_URL!;
-// const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+  api_key: process.env.CLOUDINARY_API_KEY!,
+  api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 
-// declare global {
-//   // eslint-disable-next-line no-var
-//   var supabase: SupabaseClient | undefined;
-// }
-
-
-
-// const globalWithSupabase = global as typeof global & {
-//   supabase?: SupabaseClient;
-// };
-
-// export const supabase =
-//   globalWithSupabase.supabase ?? createClient(supabaseUrl, supabaseAnonKey);
-
-// if (process.env.NODE_ENV !== 'production') {
-//   globalWithSupabase.supabase = supabase;
-// }
-
+export { cloudinary };
 
 // lib/prisma.ts
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -29,8 +16,6 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 export const prisma =
   globalForPrisma.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
-// import { PrismaClient } from "@prisma/client"
 
 
 

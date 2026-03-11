@@ -3,11 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: '3mb',
+      bodySizeLimit: '500mb',
     },
   },
   images: {
-    domains: ['jcmfszwaxbdnnugiuwcs.supabase.co'],
+    domains: ['res.cloudinary.com'],
   },
 };
 
