@@ -6,6 +6,8 @@ import sharp from "sharp";
 import { notFound, redirect } from "next/navigation";
 import { revalidateTag } from "next/cache";
 
+type CloudinaryResult = { public_id: string; secure_url: string }
+
 const fileSchema = z.instanceof(File, {message :  "File is required"})
 const imageSchema = fileSchema.refine(file=> file.size === 0 || file.type.startsWith("image/"))
 
@@ -25,24 +27,24 @@ export async function addProduct(prevState: unknown, formData: FormData){
     }
     const data  = result.data;
     // read buffers from the uploaded files
-    let actualImage = Buffer.from(await data.image.arrayBuffer());
+    const rawImage = Buffer.from(await data.image.arrayBuffer());
+    const actualImage = await sharp(rawImage)
+    .resize({ width: 1024, withoutEnlargement: true })
+    .jpeg({ quality: 80 })
+    .toBuffer();
     const actualFile = Buffer.from(await data.file.arrayBuffer());
 
     // compress/resize the image before sending to Cloudinary
     // you can tweak width/quality as needed
-    actualImage = await sharp(actualImage)
-      .resize({ width: 1024, withoutEnlargement: true })
-      .jpeg({ quality: 80 })
-      .toBuffer();
 
     const uuid = crypto.randomUUID();
     const filePath = `products/images/${uuid}-${data.file.name}`
     const imagePath = `products/images/${uuid}-${data.image.name}`
 
     // Upload image to Cloudinary
-    let imageUploadResult;
+    let imageUploadResult: CloudinaryResult | undefined;
     try {
-        imageUploadResult = await new Promise((resolve, reject) => {
+        imageUploadResult = await new Promise<CloudinaryResult>((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 {
                     folder: 'products/images',
@@ -51,7 +53,8 @@ export async function addProduct(prevState: unknown, formData: FormData){
                 },
                 (error, result) => {
                     if (error) reject(error);
-                    else resolve(result);
+                    else if (result) resolve(result);
+                    else reject(new Error("No result returned from Cloudinary"));
                 }
             );
             uploadStream.end(actualImage);
@@ -72,7 +75,8 @@ export async function addProduct(prevState: unknown, formData: FormData){
                 },
                 (error, result) => {
                     if (error) reject(error);
-                    else resolve(result);
+                    else if (result) resolve(result);
+                    else reject(new Error("No result returned from Cloudinary"));
                 }
             );
             uploadStream.end(actualFile);
@@ -81,7 +85,9 @@ export async function addProduct(prevState: unknown, formData: FormData){
         console.error("Error uploading file to Cloudinary:", error);
         // Try to delete the image if file upload failed
         try {
-            await cloudinary.uploader.destroy(imageUploadResult.public_id, { resource_type: 'image' });
+            if (imageUploadResult?.public_id) {
+                await cloudinary.uploader.destroy(imageUploadResult.public_id, { resource_type: 'image' });
+            }
         } catch (cleanupError) {
             console.error("Error cleaning up image after file upload failure:", cleanupError);
         }
