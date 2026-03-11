@@ -103,7 +103,7 @@ export async function addProduct(prevState: unknown, formData: FormData){
         imagePath,
         isAvailableForPurchase: true
     }})
-    revalidateTag("products")
+    revalidateTag("products", "layout")
     redirect("/admin/products");
 }
 
