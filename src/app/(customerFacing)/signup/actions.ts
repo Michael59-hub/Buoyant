@@ -3,7 +3,6 @@
 import { prisma } from "@/db/db"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
-import { redirect } from "next/navigation"
 import { signIn } from "@/auth"
 
 const signupSchema = z.object({

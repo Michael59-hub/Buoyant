@@ -9,13 +9,11 @@ import { useSearchParams } from "next/navigation"
 export default function LoginPage() {
   const searchParams = useSearchParams()
   const urlError = searchParams.get("error")
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
-    setError("")
 
     const formData = new FormData(e.currentTarget)
 
@@ -27,13 +25,12 @@ export default function LoginPage() {
       })
 
       if (!result || result.error) {
-        setError("Invalid email or password")
         setLoading(false)
       } else {
         window.location.href = "/"
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.")
+      console.log(err)
       setLoading(false)
     }
   }

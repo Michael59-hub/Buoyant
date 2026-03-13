@@ -1,6 +1,5 @@
 import { Nav, NavLink } from "@/components/Nav"
 import { auth } from "@/auth"
-import SessionWrapper from "@/components/SessionWrapper"
 
 export const dynamic = "force-dynamic"
 

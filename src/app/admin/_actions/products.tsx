@@ -6,7 +6,6 @@ import { z } from "zod";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-type CloudinaryResult = { public_id: string; secure_url: string }
 
 const fileSchema = z.instanceof(File, {message :  "File is required"})
 const imageSchema = fileSchema.refine(file=> file.size === 0 || file.type.startsWith("image/"))

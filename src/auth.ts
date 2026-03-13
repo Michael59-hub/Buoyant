@@ -44,13 +44,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       // When user first signs in, copy role into the token
-      if (user) token.role = (user as any).role
+      if (user) token.role = (user as { role?: string }).role
       return token
     },
     async session({ session, token }) {
       // Copy from token into session so your app can read it
       if (token.sub) session.user.id = token.sub
-      if (token.role) (session.user as any).role = token.role
+      if (token.role) (session.user as { role?: string }).role = token.role as string
       return session
     }
   }

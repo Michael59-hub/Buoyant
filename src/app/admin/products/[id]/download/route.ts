@@ -1,4 +1,5 @@
-import { prisma, cloudinary } from "@/db/db";
+import { prisma } from "@/db/db";
+import { cloudinary } from "@/lib/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest,{params} : {params: Promise<{id: string}>}){

@@ -4,11 +4,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ComponentProps, useState, useEffect, useRef } from "react"
 import { signOut, useSession } from "next-auth/react"
+import type { Session } from "next-auth"
 
 export function Nav({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const isLoggedIn = status === "authenticated"
-  const isAdmin = (session?.user as any)?.role === "admin"
+  const isAdmin = (session?.user as { role?: string })?.role === "admin"
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/8 bg-[#080808]/80 backdrop-blur-xl">
@@ -55,7 +56,7 @@ export function Nav({ children }: { children: React.ReactNode }) {
   )
 }
 
-function UserMenu({ session }: { session: any }) {
+function UserMenu({ session }: { session: Session | null }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
