@@ -1,6 +1,7 @@
 "use server"
 
-import { prisma, cloudinary } from "@/db/db";
+import { prisma } from "@/db/db";
+import { cloudinary } from "@/lib/cloudinary";
 import { z } from "zod";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";

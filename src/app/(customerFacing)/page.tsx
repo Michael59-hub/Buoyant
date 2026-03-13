@@ -42,10 +42,10 @@ export default async function HomePage() {
               </svg>
             </Link>
             <Link
-              href="/orders"
+              href="/signup"
               className="inline-flex items-center gap-2 border border-white/15 text-white/70 font-medium px-8 py-4 rounded-full text-sm hover:border-white/40 hover:text-white transition-all duration-200"
             >
-              My Orders
+              Create free account
             </Link>
           </div>
 

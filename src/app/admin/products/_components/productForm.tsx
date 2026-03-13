@@ -1,14 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { formatCurrency } from "@/lib/formatters"
 import React, { useState, useTransition } from "react"
+import { formatCurrency } from "@/lib/formatters"
 import { addProduct, updateProduct } from "../../_actions/products"
 import { Product } from "../../../../../generated/prisma/client"
 import Image from "next/image"
+import { uploadProductImage, uploadProductFile } from "@/lib/cloudinaryUpload"
 
 type FormErrors =
   | { name?: string[]; price?: string[]; description?: string[]; image?: string[]; file?: string[]; category?: string[] }
@@ -18,31 +15,27 @@ type FormErrors =
 const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!
 const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
 
-async function uploadToCloudinary(file: File, resourceType: "image" | "raw"): Promise<string> {
-    console.log("Cloud name:", CLOUDINARY_CLOUD_NAME)
-  console.log("Preset:", CLOUDINARY_UPLOAD_PRESET)
-  console.log("File:", file.name, file.size, file.type)
-  console.log("URL:", `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`)
-  const data = new FormData()
-  data.append("file", file)
-  data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET)
-  data.append("folder", resourceType === "image" ? "products/images" : "products/files")
 
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
-    { method: "POST", body: data }
-  )
 
-  if (!res.ok) throw new Error(`Cloudinary upload failed: ${res.statusText}`)
-  const result = await res.json()
-  return result.public_id as string
-}
+const CATEGORIES = [
+  { value: "music", label: "Music", emoji: "🎵" },
+  { value: "image", label: "Images", emoji: "🖼️" },
+  { value: "book", label: "Books", emoji: "📖" },
+  { value: "template", label: "Templates", emoji: "📐" },
+  { value: "font", label: "Fonts", emoji: "✏️" },
+  { value: "video", label: "Video", emoji: "🎬" },
+  { value: "software", label: "Software", emoji: "💾" },
+  { value: "course", label: "Courses", emoji: "🎓" },
+  { value: "preset", label: "Presets", emoji: "🎛️" },
+]
 
 export default function ProductForm({ product }: { product?: Product | null }) {
   const [errors, setErrors] = useState<FormErrors>(undefined)
   const [priceInCents, setPriceInCents] = useState<number | undefined>(product?.price)
   const [isPending, startTransition] = useTransition()
   const [uploadStatus, setUploadStatus] = useState<string>("")
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
 
   const fieldErrors = errors && !("general" in errors) ? errors : null
   const generalError = errors && "general" in errors ? errors.general : null
@@ -51,7 +44,6 @@ export default function ProductForm({ product }: { product?: Product | null }) {
     e.preventDefault()
     setErrors(undefined)
     const formData = new FormData(e.currentTarget)
-
     const imageFile = formData.get("image") as File | null
     const productFile = formData.get("file") as File | null
 
@@ -64,28 +56,22 @@ export default function ProductForm({ product }: { product?: Product | null }) {
     try {
       if (imageFile && imageFile.size > 0) {
         setUploadStatus("Uploading image...")
-        const imagePath = await uploadToCloudinary(imageFile, "image")
+        const imagePath = await uploadProductImage(imageFile)
         metaData.append("imagePath", imagePath)
-      } else if (product?.imagePath) {
-        metaData.append("imagePath", product.imagePath)
       }
 
       if (productFile && productFile.size > 0) {
         setUploadStatus("Uploading file...")
-        const filePath = await uploadToCloudinary(productFile, "raw")
+        const filePath = await uploadProductFile(productFile)
         metaData.append("filePath", filePath)
-      } else if (product?.filePath) {
-        metaData.append("filePath", product.filePath)
       }
 
       setUploadStatus("Saving product...")
-
       startTransition(async () => {
         const result =
           product == null
             ? await addProduct(undefined, metaData)
             : await updateProduct(product.id, undefined, metaData)
-
         if (result) setErrors(result as FormErrors)
         setUploadStatus("")
       })
@@ -96,89 +82,164 @@ export default function ProductForm({ product }: { product?: Product | null }) {
     }
   }
 
+  const isLoading = isPending || !!uploadStatus
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {generalError && (
-        <p className="text-destructive font-medium">{generalError}</p>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl px-5 py-4">
+          <p className="text-red-400 text-sm">{generalError}</p>
+        </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input type="text" id="name" name="name" required defaultValue={product?.name || ""} />
-        {fieldErrors?.name && <p className="text-destructive">{fieldErrors.name}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="price">Price in Cents</Label>
-        <Input
-          type="number"
-          id="price"
-          name="price"
-          required
-          value={priceInCents}
-          onChange={e => setPriceInCents(Number(e.target.value))}
+      {/* Name */}
+      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-6 space-y-3">
+        <label htmlFor="name" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Product Name</label>
+        <input
+          type="text" id="name" name="name" required
+          defaultValue={product?.name || ""}
+          placeholder="e.g. Minimal UI Kit"
+          className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all"
         />
-        <div className="text-muted-foreground">
-          {formatCurrency((priceInCents || 0) / 100)}
-        </div>
-        {fieldErrors?.price && <p className="text-destructive">{fieldErrors.price}</p>}
+        {fieldErrors?.name && <p className="text-red-400 text-xs">{fieldErrors.name}</p>}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea id="description" name="description" defaultValue={product?.description || ""} required />
-        {fieldErrors?.description && <p className="text-destructive">{fieldErrors.description}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="file">File</Label>
-        <Input type="file" id="file" name="file" required={product == null} />
-        {product != null && (
-          <div className="text-muted-foreground text-sm">{product?.filePath}</div>
-        )}
-        {fieldErrors?.file && <p className="text-destructive">{fieldErrors.file}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="image">Image</Label>
-        <Input type="file" id="image" name="image" accept="image/*" required={product == null} />
-        {product != null && product.imagePath && (
-          <Image
-            src={`https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${product.imagePath}`}
-            width={400}
-            height={400}
-            alt={product.imagePath}
+      {/* Price */}
+      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-6 space-y-3">
+        <label htmlFor="price" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Price (in cents)</label>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-sm font-mono">¢</span>
+          <input
+            type="number" id="price" name="price" required
+            value={priceInCents ?? ""}
+            onChange={e => setPriceInCents(Number(e.target.value))}
+            placeholder="0"
+            className="w-full bg-white/4 border border-white/10 rounded-xl pl-8 pr-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all font-mono"
           />
+        </div>
+        {priceInCents != null && priceInCents > 0 && (
+          <p className="text-[#c8f533] text-sm font-mono">= {formatCurrency(priceInCents / 100)}</p>
         )}
-        {fieldErrors?.image && <p className="text-destructive">{fieldErrors.image}</p>}
+        {fieldErrors?.price && <p className="text-red-400 text-xs">{fieldErrors.price}</p>}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <select
-          id="category"
-          name="category"
-          required
-          defaultValue={product?.category || ""}
-          className="w-full border rounded-md px-3 py-2 text-sm"
-        >
-          <option value="" disabled>Select a category</option>
-          <option value="music">Music</option>
-          <option value="image">Images</option>
-          <option value="book">Books</option>
-          <option value="template">Templates</option>
-          <option value="font">Fonts</option>
-          <option value="video">Video</option>
-          <option value="software">Software</option>
-          <option value="course">Courses</option>
-          <option value="preset">Presets</option>
-        </select>
-        {fieldErrors?.category && <p className="text-destructive">{fieldErrors.category}</p>}
+      {/* Description */}
+      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-6 space-y-3">
+        <label htmlFor="description" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Description</label>
+        <textarea
+          id="description" name="description" required rows={4}
+          defaultValue={product?.description || ""}
+          placeholder="Describe your product..."
+          className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all resize-none"
+        />
+        {fieldErrors?.description && <p className="text-red-400 text-xs">{fieldErrors.description}</p>}
       </div>
 
-      <Button type="submit" disabled={isPending}>
-        {isPending ? uploadStatus || "Saving..." : "Save"}
-      </Button>
+      {/* Category */}
+      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-6 space-y-3">
+        <label className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Category</label>
+        <div className="grid grid-cols-3 gap-2">
+          {CATEGORIES.map((cat) => (
+            <label
+              key={cat.value}
+              className="relative flex items-center gap-2 bg-white/4 border border-white/10 rounded-xl px-3 py-2.5 cursor-pointer hover:border-white/20 transition-all has-[:checked]:border-[#c8f533]/50 has-[:checked]:bg-[#c8f533]/5"
+            >
+              <input type="radio" name="category" value={cat.value} defaultChecked={product?.category === cat.value} required className="sr-only" />
+              <span className="text-base">{cat.emoji}</span>
+              <span className="text-white/60 text-xs font-medium">{cat.label}</span>
+            </label>
+          ))}
+        </div>
+        {fieldErrors?.category && <p className="text-red-400 text-xs">{fieldErrors.category}</p>}
+      </div>
+
+      {/* Image */}
+      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-6 space-y-3">
+        <label className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Product Image</label>
+        {product?.imagePath && !imagePreview && (
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10">
+            <Image
+              src={`https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${product.imagePath}`}
+              fill className="object-cover" alt="Current product image"
+            />
+          </div>
+        )}
+        {imagePreview && (
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-[#c8f533]/20">
+            <Image src={imagePreview} fill className="object-cover" alt="Preview" />
+          </div>
+        )}
+        <label className="flex flex-col items-center justify-center gap-2 border border-dashed border-white/15 rounded-xl px-4 py-6 cursor-pointer hover:border-white/25 hover:bg-white/[0.02] transition-all">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="white" strokeWidth="1.5" strokeOpacity=".3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-white/30 text-xs font-mono">{imagePreview ? "Change image" : "Upload image"}</span>
+          <input
+            type="file" id="image" name="image" accept="image/*"
+            required={product == null} className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) setImagePreview(URL.createObjectURL(file))
+            }}
+          />
+        </label>
+        {fieldErrors?.image && <p className="text-red-400 text-xs">{fieldErrors.image}</p>}
+      </div>
+
+      {/* File */}
+      <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-6 space-y-3">
+        <label className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Product File</label>
+        {product?.filePath && !selectedFileName && (
+          <div className="flex items-center gap-3 bg-white/4 border border-white/10 rounded-xl px-4 py-3">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z" stroke="white" strokeWidth="1.2" strokeOpacity=".4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <p className="text-white/30 text-xs font-mono truncate">{product.filePath}</p>
+          </div>
+        )}
+        {selectedFileName && (
+          <div className="flex items-center gap-3 bg-[#c8f533]/5 border border-[#c8f533]/20 rounded-xl px-4 py-3">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8l4 4 8-8" stroke="#c8f533" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <p className="text-[#c8f533] text-xs font-mono truncate">{selectedFileName}</p>
+          </div>
+        )}
+        <label className="flex flex-col items-center justify-center gap-2 border border-dashed border-white/15 rounded-xl px-4 py-6 cursor-pointer hover:border-white/25 hover:bg-white/[0.02] transition-all">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="white" strokeWidth="1.5" strokeOpacity=".3" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M14 2v6h6M12 11v6M9 14l3-3 3 3" stroke="white" strokeWidth="1.5" strokeOpacity=".3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-white/30 text-xs font-mono">{selectedFileName ? "Change file" : "Upload file"}</span>
+          <input
+            type="file" id="file" name="file"
+            required={product == null} className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) setSelectedFileName(file.name)
+            }}
+          />
+        </label>
+        {fieldErrors?.file && <p className="text-red-400 text-xs">{fieldErrors.file}</p>}
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit" disabled={isLoading}
+        className="w-full bg-[#c8f533] text-black font-bold py-4 rounded-2xl text-sm tracking-wide hover:bg-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {isLoading ? (
+          <>
+            <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity=".2"/>
+              <path d="M12 2a10 10 0 0110 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+            </svg>
+            {uploadStatus || "Saving..."}
+          </>
+        ) : (
+          product ? "Save Changes →" : "Add Product →"
+        )}
+      </button>
     </form>
   )
 }

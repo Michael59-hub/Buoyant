@@ -1,24 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
-import { isValidPassword} from "./lib/isValidPassword";
+import { auth } from "@/auth"
+import { NextResponse } from "next/server"
 
-export async function middleware(req: NextRequest) {
-    if(await isAuthenticated(req) === false){
-        return new NextResponse("Unauthorised", {
-            status: 401,
-            headers: {"WWW-Authenticate": "Basic"}
-        })
-    }
-}
+export default auth((req) => {
+  const isLoggedIn = !!req.auth
+  const isAdmin = req.auth?.user?.role === "admin"
+  const pathname = req.nextUrl.pathname
 
-export async function isAuthenticated(req: NextRequest) {
-    const auth = req.headers.get("Authorization") || req.headers.get("authorization")
-    if (!auth) return false;
+  const isAdminRoute = pathname.startsWith("/admin")
+  const isProtectedRoute = pathname.startsWith("/orders")
+  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/signup")
 
-    const [username, password] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":");
-    console.log(username, password);
-    return username === process.env.BASIC_AUTH_USERNAME && await isValidPassword(password, process.env.HASHED_ADMIN_PASSWORD as string);
-}
+  // Block non-admins from admin routes entirely
+  if (isAdminRoute && !isAdmin) {
+    return NextResponse.redirect(new URL("/login", req.url))
+  }
+
+  // Redirect logged-out users away from protected pages
+  if (isProtectedRoute && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/login", req.url))
+  }
+
+  // Redirect logged-in users away from login/signup
+  if (isAuthPage && isLoggedIn) {
+    return NextResponse.redirect(new URL("/", req.url))
+  }
+})
 
 export const config = {
-    matcher: "/admin/:path*",
+  matcher: ["/admin/:path*", "/orders/:path*", "/login", "/signup"],
 }

@@ -1,39 +1,41 @@
-import { Nav, NavLink } from "@/components/Nav";
+import { Nav, NavLink } from "@/components/Nav"
+import { auth } from "@/auth"
+import SessionWrapper from "@/components/SessionWrapper"
 
+export const dynamic = "force-dynamic"
 
-// export default function AdminLayout({
-//     children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   return <>
-//       <Nav>
-//         <Link href="/admin" className={cn("p-4 hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground")}>Dashboard</Link>
-//         <Link href="/admin/products" className={cn("p-4 hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground")}>Products</Link>
-//         <Link href="/admin/users" className={cn("p-4 hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground")}>Customers</Link>
-//         <Link href="/admin/orders" className={cn("p-4 hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground")}>Sales</Link>
-//       </Nav>
-//     <div className="container my-6">{children}</div>
-//     </>;
-
-// }
-
-export const dynamic = "force-dynamic";
-
-export default function AdminLayout({
-    children,
+export default async function Layout({
+  children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
-  return <>
-      <Nav>
-        <NavLink href="/admin">Dashboard</NavLink>
-        <NavLink href="/admin/products">Products</NavLink>
-        <NavLink href="/admin/users">Customers</NavLink>
-        <NavLink href="/admin/orders">Sales</NavLink>
-      </Nav>
-    <div className="container my-6">{children}</div>
-    </>;
+  // Read the session on the server
+  const session = await auth()
 
+  return (
+    // SessionProvider makes the session available to all client components
+    // We pass the server session in so there's no loading flicker
+      <div className="min-h-screen bg-[#080808]">
+        <Nav>
+          <NavLink href="/">Home</NavLink>
+          <NavLink href="/admin/products">Products</NavLink>
+          {session?.user && (
+            <NavLink href="/orders">My Orders</NavLink>
+          )}
+        </Nav>
+        <main>{children}</main>
+
+        {/* Footer */}
+        <footer className="border-t border-white/8 mt-10 px-6 py-10 max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <span className="text-white font-black text-xl tracking-tighter">
+              Buoyant<span className="text-[#c8f533]">.</span>
+            </span>
+            <p className="text-white/25 text-sm">
+              © {new Date().getFullYear()} Buoyant. All rights reserved.
+            </p>
+          </div>
+        </footer>
+      </div>
+  )
 }
-
