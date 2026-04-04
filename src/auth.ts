@@ -36,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!passwordMatch) return null
 
         // Include role here so it flows into the token
-        return { id: user.id, email: user.email, name: user.name, role: user.role }
+        return { id: user.id, email: user.email, name: user.name, role: user.role as  "customer" | "vendor" | "admin" }
       }
     })
   ],
