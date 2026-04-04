@@ -4,7 +4,8 @@ import { formatCurrency } from "@/lib/formatters"
 
 export default async function VendorOrdersPage() {
   const session = await auth()
-  const vendorId = session?.user?.id!
+  const vendorId = session?.user?.id
+  if (!vendorId) return null
 
   const orders = await prisma.order.findMany({
     where: { product: { vendorId } },

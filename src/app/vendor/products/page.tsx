@@ -7,7 +7,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 
 export default async function VendorProductsPage() {
   const session = await auth()
-  const vendorId = session?.user?.id!
+  const vendorId = session?.user?.id
+  if (!vendorId) return null
 
   const products = await prisma.product.findMany({
     where: { vendorId },

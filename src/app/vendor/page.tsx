@@ -5,7 +5,8 @@ import Link from "next/link"
 
 export default async function VendorDashboard() {
   const session = await auth()
-  const vendorId = session?.user?.id!
+  const vendorId = session?.user?.id
+  if (!vendorId) return null
 
   const [salesData, productData, recentSales, topProducts] = await Promise.all([
     getVendorSalesData(vendorId),

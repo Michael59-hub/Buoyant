@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
             password<span className="text-[#c8f533]">?</span>
           </h2>
           <p className="text-white/35 text-base max-w-sm leading-relaxed">
-            No worries. Enter your email and we'll send you a link to reset it.
+            No worries. Enter your email and we&apos;ll send you a link to reset it.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
               Back to login
             </Link>
             <h1 className="text-4xl font-black text-white tracking-tight mb-2">Reset password</h1>
-            <p className="text-white/40 text-sm">We'll send a reset link to your email.</p>
+            <p className="text-white/40 text-sm">We&apos;ll send a reset link to your email.</p>
           </div>
 
           {state?.success ? (
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
               </div>
               <h2 className="text-white font-bold text-lg mb-2">Check your email</h2>
               <p className="text-white/40 text-sm leading-relaxed">
-                If an account exists for that email, we've sent a password reset link. Check your inbox and spam folder.
+                If an account exists for that email, we&apos;ve sent a password reset link. Check your inbox and spam folder.
               </p>
               <Link
                 href="/login"

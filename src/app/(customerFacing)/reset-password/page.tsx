@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <div className="relative">
-          <p className="text-white/20 text-xs font-mono">You'll be signed in automatically after resetting.</p>
+          <p className="text-white/20 text-xs font-mono">You&apos;ll be signed in automatically after resetting.</p>
         </div>
       </div>
 
