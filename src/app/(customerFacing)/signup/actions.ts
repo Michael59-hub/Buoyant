@@ -11,6 +11,7 @@ const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
+  role: z.enum(["customer", "vendor"]),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -21,7 +22,7 @@ export async function signupAction(prevState: unknown, formData: FormData) {
 
   if (!result.success) return result.error.formErrors.fieldErrors
 
-  const { firstName, lastName, email, password } = result.data
+  const { firstName, lastName, email, password, role } = result.data
 
   // Check if user already exists
   const existing = await prisma.user.findUnique({ where: { email } })
@@ -36,6 +37,7 @@ export async function signupAction(prevState: unknown, formData: FormData) {
       name: `${firstName} ${lastName}`,
       email,
       hashedPassword,
+      role,
     }
   })
 

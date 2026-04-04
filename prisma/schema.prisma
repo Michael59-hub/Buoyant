@@ -17,6 +17,8 @@ model Product{
   id                      String   @id @default(uuid())
   name                    String
   price                   Int
+  vendorId                String  @default("c8cbac5f-452e-42d9-b750-17aacd22ff3c")
+  vendor                   User      @relation("VendorProducts", fields: [vendorId], references: [id], onDelete: Cascade)
   filePath                String
   imagePath               String
   description             String
@@ -33,10 +35,11 @@ model User{
   email             String @unique
   hashedPassword    String?
   name              String?
-  role              String   @default("user")
+  role              String   @default("customer")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   orders Order[]
+  products       Product[] @relation("VendorProducts")
 }
 
 model Order{
@@ -56,4 +59,12 @@ model DownloadVerification{
   createdAt   DateTime  @default(now())
   productId   String
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import React from "react"
+import React, { useState } from "react"
 import { useActionState } from "react"
 import { signupAction } from "./actions"
 
@@ -12,6 +12,7 @@ type FormErrors =
       email?: string[]
       password?: string[]
       confirmPassword?: string[]
+      role?: string[]
     }
   | { general: string }
   | undefined
@@ -21,6 +22,7 @@ export default function SignupPage() {
     signupAction,
     undefined
   )
+  const [selectedRole, setSelectedRole] = useState<"customer" | "vendor">("customer")
 
   const fieldErrors = errors && !("general" in errors) ? errors : null
   const generalError = errors && "general" in errors ? errors.general : null
@@ -42,19 +44,22 @@ export default function SignupPage() {
         <div className="relative space-y-6">
           <p className="text-xs font-mono text-[#c8f533] tracking-[0.2em] uppercase">Get started free</p>
           <h2 className="text-5xl font-black text-white tracking-tighter leading-[0.9]">
-            Join thousands<br />
-            of creators<br />
-            today<span className="text-[#c8f533]">.</span>
+            {selectedRole === "vendor" ? (
+              <>Start selling<br />your digital<br />products<span className="text-[#c8f533]">.</span></>
+            ) : (
+              <>Join thousands<br />of creators<br />today<span className="text-[#c8f533]">.</span></>
+            )}
           </h2>
           <p className="text-white/35 text-base max-w-sm leading-relaxed">
-            Create your account to start buying and downloading premium digital products instantly.
+            {selectedRole === "vendor"
+              ? "Create your vendor account to upload, sell, and manage your digital products."
+              : "Create your account to start buying and downloading premium digital products instantly."}
           </p>
           <ul className="space-y-3 pt-2">
-            {[
-              "Instant access after purchase",
-              "Lifetime download access",
-              "Order history & receipts",
-            ].map((feat) => (
+            {(selectedRole === "vendor"
+              ? ["Upload & sell your products", "Set your own prices", "Track your sales & revenue"]
+              : ["Instant access after purchase", "Lifetime download access", "Order history & receipts"]
+            ).map((feat) => (
               <li key={feat} className="flex items-center gap-3 text-sm text-white/50">
                 <span className="w-5 h-5 rounded-full bg-[#c8f533]/15 border border-[#c8f533]/30 flex items-center justify-center flex-shrink-0">
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
@@ -76,145 +81,139 @@ export default function SignupPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
         <div className="w-full max-w-md">
 
-          {/* Mobile logo */}
           <div className="lg:hidden mb-10">
             <Link href="/" className="text-white font-black text-2xl tracking-tighter">
               Buoyant<span className="text-[#c8f533]">.</span>
             </Link>
           </div>
 
-          {/* Header */}
-          <div className="mb-10">
+          <div className="mb-8">
             <h1 className="text-4xl font-black text-white tracking-tight mb-2">Create account</h1>
             <p className="text-white/40 text-sm">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#c8f533] hover:underline font-medium">
-                Sign in
-              </Link>
+              <Link href="/login" className="text-[#c8f533] hover:underline font-medium">Sign in</Link>
             </p>
           </div>
 
-          {/* General error */}
           {generalError && (
             <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3 mb-5">
               {generalError}
             </p>
           )}
 
-          {/* Form */}
           <form action={action} className="space-y-5">
+
+            {/* ── ROLE SELECTOR ── */}
+            <div className="space-y-2">
+              <p className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">I want to</p>
+              <div className="grid grid-cols-2 gap-3">
+                {(["customer", "vendor"] as const).map((role) => (
+                  <label
+                    key={role}
+                    className={`relative flex flex-col gap-2 border rounded-2xl px-4 py-4 cursor-pointer transition-all ${
+                      selectedRole === role
+                        ? "border-[#c8f533]/50 bg-[#c8f533]/5"
+                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <input
+                      type="radio" name="role" value={role}
+                      checked={selectedRole === role}
+                      onChange={() => setSelectedRole(role)}
+                      className="sr-only"
+                    />
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${selectedRole === role ? "bg-[#c8f533]/15" : "bg-white/5"}`}>
+                      {role === "customer" ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
+                            stroke={selectedRole === role ? "#c8f533" : "white"}
+                            strokeWidth="1.5" strokeOpacity={selectedRole === role ? "1" : "0.3"}
+                            strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                            stroke={selectedRole === role ? "#c8f533" : "white"}
+                            strokeWidth="1.5" strokeOpacity={selectedRole === role ? "1" : "0.3"}
+                            strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className={`text-sm font-bold ${selectedRole === role ? "text-white" : "text-white/50"}`}>
+                        {role === "customer" ? "Buy products" : "Sell products"}
+                      </p>
+                      <p className="text-xs text-white/25 mt-0.5">
+                        {role === "customer" ? "Browse & purchase" : "Upload & earn"}
+                      </p>
+                    </div>
+                    {selectedRole === role && (
+                      <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-[#c8f533] flex items-center justify-center">
+                        <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5l2.5 2.5 3.5-4" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    )}
+                  </label>
+                ))}
+              </div>
+              {fieldErrors?.role && <p className="text-red-400 text-xs">{fieldErrors.role[0]}</p>}
+            </div>
+
+            {/* Name */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label htmlFor="firstName" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">
-                  First name
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  placeholder="John"
-                  required
-                  className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 focus:bg-white/6 transition-all"
-                />
-                {fieldErrors?.firstName && (
-                  <p className="text-red-400 text-xs">{fieldErrors.firstName[0]}</p>
-                )}
+                <label htmlFor="firstName" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">First name</label>
+                <input type="text" id="firstName" name="firstName" placeholder="John" required
+                  className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all" />
+                {fieldErrors?.firstName && <p className="text-red-400 text-xs">{fieldErrors.firstName[0]}</p>}
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="lastName" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">
-                  Last name
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Doe"
-                  required
-                  className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 focus:bg-white/6 transition-all"
-                />
-                {fieldErrors?.lastName && (
-                  <p className="text-red-400 text-xs">{fieldErrors.lastName[0]}</p>
-                )}
+                <label htmlFor="lastName" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Last name</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Doe" required
+                  className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all" />
+                {fieldErrors?.lastName && <p className="text-red-400 text-xs">{fieldErrors.lastName[0]}</p>}
               </div>
             </div>
 
+            {/* Email */}
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="you@example.com"
-                required
-                className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 focus:bg-white/6 transition-all"
-              />
-              {fieldErrors?.email && (
-                <p className="text-red-400 text-xs">{fieldErrors.email[0]}</p>
-              )}
+              <label htmlFor="email" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required
+                className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all" />
+              {fieldErrors?.email && <p className="text-red-400 text-xs">{fieldErrors.email[0]}</p>}
             </div>
 
+            {/* Password */}
             <div className="space-y-1.5">
-              <label htmlFor="password" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Min. 8 characters"
-                required
-                className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 focus:bg-white/6 transition-all"
-              />
-              {fieldErrors?.password && (
-                <p className="text-red-400 text-xs">{fieldErrors.password[0]}</p>
-              )}
+              <label htmlFor="password" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Password</label>
+              <input type="password" id="password" name="password" placeholder="Min. 8 characters" required
+                className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all" />
+              {fieldErrors?.password && <p className="text-red-400 text-xs">{fieldErrors.password[0]}</p>}
             </div>
 
+            {/* Confirm password */}
             <div className="space-y-1.5">
-              <label htmlFor="confirmPassword" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">
-                Confirm password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="••••••••"
-                required
-                className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 focus:bg-white/6 transition-all"
-              />
-              {fieldErrors?.confirmPassword && (
-                <p className="text-red-400 text-xs">{fieldErrors.confirmPassword[0]}</p>
-              )}
+              <label htmlFor="confirmPassword" className="text-xs font-mono text-white/40 uppercase tracking-[0.15em]">Confirm password</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required
+                className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-white/20 outline-none focus:border-[#c8f533]/50 transition-all" />
+              {fieldErrors?.confirmPassword && <p className="text-red-400 text-xs">{fieldErrors.confirmPassword[0]}</p>}
             </div>
 
+            {/* Terms */}
             <div className="flex items-start gap-3 pt-1">
-              <input
-                type="checkbox"
-                id="terms"
-                name="terms"
-                required
-                className="mt-0.5 w-4 h-4 accent-[#c8f533] flex-shrink-0"
-              />
+              <input type="checkbox" id="terms" name="terms" required className="mt-0.5 w-4 h-4 accent-[#c8f533] flex-shrink-0" />
               <label htmlFor="terms" className="text-xs text-white/35 leading-relaxed">
                 I agree to the{" "}
-                <Link href="/terms" className="text-white/60 hover:text-[#c8f533] underline transition-colors">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" className="text-white/60 hover:text-[#c8f533] underline transition-colors">
-                  Privacy Policy
-                </Link>
+                <Link href="/terms" className="text-white/60 hover:text-[#c8f533] underline transition-colors">Terms of Service</Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="text-white/60 hover:text-[#c8f533] underline transition-colors">Privacy Policy</Link>
               </label>
             </div>
 
-            <button
-              type="submit"
-              disabled={isPending}
-              className="w-full bg-[#c8f533] text-black font-bold py-4 rounded-xl text-sm tracking-wide hover:bg-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isPending ? "Creating account..." : "Create account →"}
+            <button type="submit" disabled={isPending}
+              className="w-full bg-[#c8f533] text-black font-bold py-4 rounded-xl text-sm tracking-wide hover:bg-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              {isPending ? "Creating account..." : `Create ${selectedRole} account →`}
             </button>
           </form>
 
@@ -225,11 +224,7 @@ export default function SignupPage() {
             <div className="flex-1 h-px bg-white/8" />
           </div>
 
-          {/* OAuth */}
-          <button
-            type="button"
-            className="w-full flex items-center justify-center gap-3 bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white/60 text-sm font-medium hover:bg-white/8 hover:border-white/20 hover:text-white transition-all"
-          >
+          <button type="button" className="w-full flex items-center justify-center gap-3 bg-white/4 border border-white/10 rounded-xl px-4 py-3.5 text-white/60 text-sm font-medium hover:bg-white/8 hover:border-white/20 hover:text-white transition-all">
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -238,7 +233,6 @@ export default function SignupPage() {
             </svg>
             Continue with Google
           </button>
-
         </div>
       </div>
     </div>

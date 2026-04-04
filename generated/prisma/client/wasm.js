@@ -124,6 +124,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
   price: 'price',
+  vendorId: 'vendorId',
   filePath: 'filePath',
   imagePath: 'imagePath',
   description: 'description',
@@ -159,6 +160,14 @@ exports.Prisma.DownloadVerificationScalarFieldEnum = {
   productId: 'productId'
 };
 
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  email: 'email',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -179,7 +188,8 @@ exports.Prisma.ModelName = {
   Product: 'Product',
   User: 'User',
   Order: 'Order',
-  DownloadVerification: 'DownloadVerification'
+  DownloadVerification: 'DownloadVerification',
+  PasswordResetToken: 'PasswordResetToken'
 };
 
 /**

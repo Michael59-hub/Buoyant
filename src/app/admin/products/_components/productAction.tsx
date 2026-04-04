@@ -8,7 +8,7 @@ export function ActiveToggleDropdownItem({id, isAvailableForPurchase}: {id: stri
     const [ispending, startTransition] = useTransition();
     const router = useRouter()
     return<>
-        <DropdownMenuItem disabled={ispending} onClick={() =>{
+        <DropdownMenuItem className="text-white/60" disabled={ispending} onClick={() =>{
             startTransition(async () =>{
                 await toggleProductAvailability(id, !isAvailableForPurchase)
                 router.refresh();
@@ -17,14 +17,14 @@ export function ActiveToggleDropdownItem({id, isAvailableForPurchase}: {id: stri
             {isAvailableForPurchase ? "Deactivate" : "Activate"}
         </DropdownMenuItem>
     </>
-} 
+}  
 
 
 export function DeleteDropdownItem({id, disabled}: {id: string, disabled: boolean}){
     const [ispending, startTransition] = useTransition();
     const router = useRouter();
     return<>
-        <DropdownMenuItem disabled={disabled || ispending} onClick={() =>{
+        <DropdownMenuItem className="text-white/60" disabled={disabled || ispending} onClick={() =>{
             startTransition(async () =>{
                 await deleteProduct(id)
                 router.refresh();
