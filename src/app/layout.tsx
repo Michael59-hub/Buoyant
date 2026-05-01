@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Buoyant",
-  description: "Get stuff right at your doorstep",
+  title: "Buoyant | Digital Product Marketplace Nigeria",
+  description: "Buy and sell premium digital products on Buoyant. From software templates to creative assets, discover high-quality digital tools designed for the Nigerian market. Start browsing today",
 };
 
 export default async function RootLayout({
