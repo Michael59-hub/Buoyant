@@ -8,6 +8,7 @@ import type { Session } from "next-auth"
 
 export function Nav({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isLoggedIn = status === "authenticated"
   const isAdmin = (session?.user as { role?: string })?.role === "admin"
 
@@ -19,16 +20,16 @@ export function Nav({ children }: { children: React.ReactNode }) {
           Buoyant<span className="text-[#c8f533]">.</span>
         </Link>
 
-        {/* Nav links */}
-        <div className="flex items-center gap-1">
+        {/* Desktop Nav links */}
+        <div className="hidden md:flex items-center gap-1">
           {children}
           {isAdmin && (
             <NavLink href="/admin">Admin</NavLink>
           )}
         </div>
 
-        {/* Auth section */}
-        <div className="flex items-center gap-2">
+        {/* Desktop Auth section */}
+        <div className="hidden md:flex items-center gap-2">
           {status === "loading" ? (
             // Skeleton while session loads
             <div className="w-24 h-8 rounded-full bg-white/5 animate-pulse" />
@@ -51,7 +52,79 @@ export function Nav({ children }: { children: React.ReactNode }) {
             </>
           )}
         </div>
+
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          )}
+        </button>
       </div>
+
+      {/* Mobile menu dropdown */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-white/8 bg-[#080808]/95 backdrop-blur-xl absolute top-full left-0 w-full flex flex-col px-6 py-4 gap-4 shadow-xl">
+          <div className="flex flex-col gap-2" onClick={() => setMobileMenuOpen(false)}>
+            {children}
+            {isAdmin && (
+              <NavLink href="/admin">Admin</NavLink>
+            )}
+          </div>
+          
+          <div className="h-px bg-white/8 w-full" />
+          
+          <div className="flex flex-col gap-3">
+            {status === "loading" ? (
+              <div className="w-full h-10 rounded-full bg-white/5 animate-pulse" />
+            ) : isLoggedIn ? (
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#c8f533] flex items-center justify-center text-black text-sm font-black">
+                    {session?.user?.name
+                      ? session.user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+                      : session?.user?.email?.[0].toUpperCase() ?? "?"}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-white text-sm font-medium">{session?.user?.name}</span>
+                    <span className="text-white/40 text-xs">{session?.user?.email}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="p-2 text-red-400 hover:bg-red-400/10 rounded-full transition-colors"
+                  aria-label="Sign out"
+                >
+                  <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                    <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full px-4 py-2.5 rounded-full text-center text-sm font-medium text-white/70 bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full px-4 py-2.5 rounded-full text-center text-sm font-bold bg-[#c8f533] text-black hover:bg-white transition-colors"
+                >
+                  Get started
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
